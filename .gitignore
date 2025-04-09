@@ -1,0 +1,30 @@
+# Python 
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.log
+
+# 가상환경
+venv/
+env/
+.venv/
+
+# 환경 변수 파일
+.env
+
+# VS Code 관련 설정
+.vscode/
+
+# 데이터 & 결과물
+data/
+*.csv
+*.wav
+
+# Jupyter Notebook 
+.ipynb_checkpoints/
+
+# 기타 캐시/빌드
+*.tmp
+*.bak
+.DS_Store
+*.swp
