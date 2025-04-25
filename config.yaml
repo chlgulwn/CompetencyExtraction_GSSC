@@ -1,0 +1,45 @@
+# Default file paths
+default_audio_file: "sample_audio.wav"
+default_transcript_name: "interview1.txt"
+default_csv_path: "interview_data/extracted_profiles.csv"
+
+# Supported audio formats
+supported_audio_formats:
+  - .wav
+  - .mp3
+  - .m4a
+
+# Directory structure
+directories:
+  transcripts: "interview_data/transcripts"
+  profiles: "interview_data/extracted_profiles"
+  logs: "logs"
+
+# Logging configuration
+logging:
+  level: INFO
+  format: "%(asctime)s - %(levelname)s - %(message)s"
+  file: "pipeline.log"
+
+# GPT configuration
+gpt_model: "gpt-4o-mini"
+temperature: 0.3
+
+# Whisper configuration
+whisper_model: "base"
+
+# Prompt template configuration
+prompt_template:
+  system_role: "당신은 시니어의 경험과 특기를 정리해주는 인터뷰 AI입니다."
+  output_format:
+    - "학력: OOO"
+    - "직업/직무: OOO"
+    - "근무 기간: OOO"
+    - "뷰티 프로젝트 경험: OOO"
+    - "후회되는 점: OOO"
+    - "강점: OOO"
+    - "협업 능력: OOO"
+    - "성격/성향: OOO"
+    - "최근 관심사: OOO"
+    - "투자 가능 자원 (돈/시간): OOO"
+    - "기대하는 수익: OOO" 
