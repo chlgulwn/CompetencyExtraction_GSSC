@@ -9,6 +9,12 @@ supported_audio_formats:
   - .mp3
   - .m4a
 
+# Supported resume formats
+supported_resume_formats:
+  - .txt
+  - .docx
+  - .pdf
+
 # Directory structure
 directories:
   transcripts: "interview_data/transcripts"
@@ -22,7 +28,7 @@ logging:
   file: "pipeline.log"
 
 # GPT configuration
-gpt_model: "gpt-4o-mini"
+gpt_model: "gpt-4"
 temperature: 0.3
 
 # Whisper configuration
@@ -42,4 +48,19 @@ prompt_template:
     - "성격/성향: OOO"
     - "최근 관심사: OOO"
     - "투자 가능 자원 (돈/시간): OOO"
+    - "기대하는 수익: OOO"
+
+# Resume prompt template configuration
+resume_prompt_template:
+  system_role: "당신은 이력서를 분석하여 핵심 역량을 추출하는 AI입니다."
+  output_format:
+    - "학력: OOO"
+    - "직업/직무: OOO"
+    - "근무 기간: OOO"
+    - "주요 프로젝트 경험: OOO"
+    - "보유 기술: OOO"
+    - "강점: OOO"
+    - "협업 능력: OOO"
+    - "성격/성향: OOO"
+    - "최근 관심사: OOO"
     - "기대하는 수익: OOO" 

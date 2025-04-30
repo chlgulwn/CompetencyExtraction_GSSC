@@ -8,6 +8,7 @@ import tempfile
 from STT_whisper.transcribe import transcribe_and_save
 from STT_whisper.realtime_transcribe import RealtimeTranscriber
 from PromptEngine.extracting_profile import extract_competency_profile
+from PromptEngine.resume_analyzer import analyze_resume
 from utils.utils_file import load_transcript, save_profile_to_csv
 
 # Configure logging
@@ -39,8 +40,7 @@ def main():
     # Title and description
     st.title("🎤 시니어 역량 추출 시스템")
     st.markdown("""
-    이 시스템은 시니어와의 인터뷰 음성을 텍스트로 변환하고, 
-    대화 내용을 분석하여 핵심 역량을 추출합니다.
+    이 시스템은 시니어와의 인터뷰 음성 또는 이력서를 분석하여 핵심 역량을 추출합니다.
     """)
     
     # Initialize session state
@@ -55,12 +55,12 @@ def main():
     col1, col2 = st.columns(2)
     
     with col1:
-        st.header("1. 음성 입력")
+        st.header("1. 입력 방식 선택")
         
         # Mode selection
         mode = st.radio(
             "입력 모드 선택",
-            ["실시간 음성 인식", "파일 업로드"],
+            ["실시간 음성 인식", "음성 파일 업로드", "이력서 업로드"],
             horizontal=True
         )
         
@@ -101,7 +101,7 @@ def main():
                 key="transcript_area"
             )
             
-        else:
+        elif mode == "음성 파일 업로드":
             # File upload
             uploaded_file = st.file_uploader(
                 "인터뷰 음성 파일을 업로드하세요",
@@ -141,6 +141,44 @@ def main():
                 
                 # Clean up temporary file
                 os.unlink(audio_path)
+                
+        else:  # 이력서 업로드
+            # Resume upload
+            uploaded_resume = st.file_uploader(
+                "이력서 파일을 업로드하세요",
+                type=config['supported_resume_formats']
+            )
+            
+            if uploaded_resume is not None:
+                # Save uploaded file to temporary location
+                with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploaded_resume.name)[1]) as tmp_file:
+                    tmp_file.write(uploaded_resume.getvalue())
+                    resume_path = tmp_file.name
+                
+                # Display file information
+                st.success(f"이력서 업로드 완료: {uploaded_resume.name}")
+                
+                # Resume analysis
+                if st.button("이력서 분석 시작"):
+                    with st.spinner("이력서를 분석 중..."):
+                        try:
+                            # Read resume content
+                            with open(resume_path, 'r', encoding='utf-8') as f:
+                                resume_text = f.read()
+                            
+                            # Analyze resume
+                            profile = analyze_resume(resume_text)
+                            
+                            # Store profile in session state
+                            st.session_state.transcript = profile
+                            
+                            st.success("이력서 분석이 완료되었습니다!")
+                            
+                        except Exception as e:
+                            st.error(f"이력서 분석 중 오류가 발생했습니다: {str(e)}")
+                
+                # Clean up temporary file
+                os.unlink(resume_path)
     
     with col2:
         st.header("2. 역량 추출")
@@ -167,7 +205,7 @@ def main():
                     except Exception as e:
                         st.error(f"역량 추출 중 오류가 발생했습니다: {str(e)}")
         else:
-            st.info("음성 인식을 먼저 완료해주세요.")
+            st.info("입력 데이터를 먼저 준비해주세요.")
 
 if __name__ == "__main__":
     main()
