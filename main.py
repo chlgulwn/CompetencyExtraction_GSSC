@@ -8,6 +8,8 @@ from PromptEngine.extracting_profile import extract_competency_profile
 from PromptEngine.resume_analyzer import analyze_resume
 from utils.utils_file import load_transcript, save_profile_to_csv
 
+os.environ["PATH"] += os.pathsep + r"C:\Users\hyeju\Downloads\ffmpeg-7.1.1-essentials_build\ffmpeg-7.1.1-essentials_build\bin"
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
