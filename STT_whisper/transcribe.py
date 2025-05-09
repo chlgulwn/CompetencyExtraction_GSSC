@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import Optional
 import yaml
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
@@ -37,14 +36,11 @@ def transcribe_and_save(
         str: Transcribed text
     """
     try:
-        # Load configuration
         config = load_config()
         
-        # Set default values
         save_name = save_name or config.get('default_transcript_name', 'transcript1.txt')
         transcript_dir = config['directories']['transcripts']
         
-        # Create directory if it doesn't exist
         os.makedirs(transcript_dir, exist_ok=True)
         
         logging.info(f"Loading Whisper model: {model_size}")
@@ -54,7 +50,6 @@ def transcribe_and_save(
         result = model.transcribe(audio_path)
         transcript_text = result["text"]
         
-        # Save transcript
         save_path = os.path.join(transcript_dir, save_name)
         with open(save_path, "w", encoding="utf-8") as f:
             f.write(transcript_text)

@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Optional
 import yaml
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
@@ -30,39 +29,35 @@ def build_prompt(user_text: str) -> str:
         str: Formatted prompt
     """
     try:
-        # Load configuration
         config = load_config()
         
-        # Get template from config or use default
         template = config.get('prompt_template', {
-            'system_role': "당신은 시니어의 경험과 특기를 정리해주는 인터뷰 AI입니다.",
+            'system_role': "You are an interview AI that summarizes the experiences and strengths of seniors.",
             'output_format': [
-                "학력: OOO",
-                "직업/직무: OOO",
-                "근무 기간: OOO",
-                "뷰티 프로젝트 경험: OOO",
-                "후회되는 점: OOO",
-                "강점: OOO",
-                "협업 능력: OOO",
-                "성격/성향: OOO",
-                "최근 관심사: OOO",
-                "투자 가능 자원 (돈/시간): OOO",
-                "기대하는 수익: OOO"
+                "Education: OOO",
+                "Job Title/Role: OOO",
+                "Employment Period: OOO",
+                "Key Project Experiences: OOO",
+                "Strengths: OOO",
+                "Collaboration Skills: OOO",
+                "Personality Traits: OOO",
+                "Recent Interests: OOO",
+                "Available Resources for Investment (Money/Time): OOO",
+                "Expected Returns: OOO"
             ]
         })
         
-        # Build prompt
         prompt = f"""
 {template['system_role']}
-아래 사용자의 대화 내용을 바탕으로 핵심 역량을 다음 형식으로 정리하세요:
+Based on the user's response below, summarize the key skills in the following format in English:
 
-[출력 예시]
+[Example Output]
 {chr(10).join(template['output_format'])}
 
-[사용자 응답]
+[User Response]
 {user_text}
 
-[정리된 결과]
+[Summarized Results]
 """
         return prompt
         

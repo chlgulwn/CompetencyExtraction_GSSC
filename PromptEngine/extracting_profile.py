@@ -7,7 +7,6 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from PromptEngine.prompt_template import build_prompt
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
@@ -33,24 +32,20 @@ def extract_competency_profile(user_text: str) -> str:
         str: Extracted competency profile
     """
     try:
-        # Load configuration
         config = load_config()
         
-        # Load API key
         load_dotenv()
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
             raise ValueError("OPENAI_API_KEY not found in environment variables")
         
-        # Initialize OpenAI client
         client = OpenAI(api_key=api_key)
         
-        # Build prompt
         prompt = build_prompt(user_text)
         
         logging.info("Sending request to GPT...")
         response = client.chat.completions.create(
-            model=config.get('gpt_model', 'gpt-4'),
+            model=config.get('gpt_model', 'gpt-4o-mini'),
             messages=[
                 {"role": "user", "content": prompt}
             ],

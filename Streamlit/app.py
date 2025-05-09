@@ -13,7 +13,6 @@ from PromptEngine.extracting_profile import extract_competency_profile
 from PromptEngine.resume_analyzer import analyze_resume
 from utils.utils_file import load_transcript, save_profile_to_csv
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
@@ -33,14 +32,14 @@ def main():
     config = load_config()
 
     st.set_page_config(
-        page_title="시니어 역량 추출 시스템",
+        page_title="Senior Competency Extraction System",
         page_icon="🎤",
         layout="wide"
     )
 
-    st.title("🎤 시니어 역량 추출 시스템")
+    st.title("🎤 Senior Competency Extraction System")
     st.markdown("""
-    이 시스템은 시니어와의 인터뷰 음성 또는 이력서를 분석하여 핵심 역량을 추출합니다.
+    The system analyzes the audio of an interview with a senior or a resume to extract key competencies.
     """)
 
     if 'transcriber' not in st.session_state:
@@ -53,11 +52,11 @@ def main():
     col1, col2 = st.columns(2)
 
     with col1:
-        st.header("1. 입력 방식 선택")
-        mode = st.radio("입력 모드 선택", ["실시간 음성 인식", "음성 파일 업로드", "이력서 업로드"], horizontal=True)
+        st.header("1. Choose an input method")
+        mode = st.radio("Select an input mode ", ["Real-time speech recognition", "Upload an audio file ", "Upload a resume"], horizontal=True)
 
-        if mode == "실시간 음성 인식":
-            if st.button("🎤 녹음 시작", disabled=st.session_state.is_recording):
+        if mode == "Real-time speech recognition":
+            if st.button("🎤 Start recording", disabled=st.session_state.is_recording):
                 try:
                     st.session_state.transcriber = RealtimeTranscriber(
                         model_size=config['whisper_model'],
@@ -65,23 +64,23 @@ def main():
                     )
                     st.session_state.transcriber.start_recording()
                     st.session_state.is_recording = True
-                    st.success("녹음이 시작되었습니다. 말씀해주세요...")
+                    st.success("Recording has started. Please speak...")
                 except Exception as e:
-                    st.error(f"녹음 시작 중 오류가 발생했습니다: {str(e)}")
+                    st.error(f"An error occurred while starting a recording: {str(e)}")
 
-            if st.button("⏹️ 녹음 중지", disabled=not st.session_state.is_recording):
+            if st.button("⏹️ Stop recording", disabled=not st.session_state.is_recording):
                 try:
                     st.session_state.transcriber.stop_recording()
                     st.session_state.is_recording = False
-                    st.success("녹음이 중지되었습니다.")
+                    st.success("Recording has stopped.")
                 except Exception as e:
-                    st.error(f"녹음 중지 중 오류가 발생했습니다: {str(e)}")
+                    st.error(f"An error occurred while stopping recording: {str(e)}")
 
-            st.subheader("인식된 텍스트")
+            st.subheader("Recognized text")
             st.text_area("", st.session_state.transcript, height=200, key="transcript_area")
 
-        elif mode == "음성 파일 업로드":
-            uploaded_file = st.file_uploader("인터뷰 음성 파일을 업로드하세요", type=config['supported_audio_formats'])
+        elif mode == "Upload an audio file":
+            uploaded_file = st.file_uploader("Upload an audio file", type=config['supported_audio_formats'])
             if uploaded_file is not None:
                 tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploaded_file.name)[1])
                 tmp_file.write(uploaded_file.getvalue())
@@ -90,57 +89,57 @@ def main():
                 audio_path = tmp_file.name  
 
 
-                st.success(f"파일 업로드 완료: {uploaded_file.name}")
+                st.success(f"File upload completed: {uploaded_file.name}")
 
-                if st.button("음성 인식 시작"):
-                    with st.spinner("음성을 텍스트로 변환 중..."):
+                if st.button("Start speech recognition "):
+                    with st.spinner("Converting speech to text ..."):
                         try:
                             transcript_name = f"transcript_{uploaded_file.name.split('.')[0]}.txt"
                             transcript_text = transcribe_and_save(audio_path, save_name=transcript_name, model_size=config['whisper_model'])
                             st.session_state.transcript = transcript_text
-                            st.success("음성 인식이 완료되었습니다!")
+                            st.success("Speech recognition is now complete!")
                         except Exception as e:
-                            st.error(f"음성 인식 중 오류가 발생했습니다: {str(e)}")
+                            st.error(f"An error occurred during speech recognition: {str(e)}")
 
                 os.unlink(audio_path)
 
         else:  
-            uploaded_resume = st.file_uploader("이력서 파일을 업로드하세요", type=config['supported_resume_formats'])
+            uploaded_resume = st.file_uploader("Upload your resume file", type=config['supported_resume_formats'])
             if uploaded_resume is not None:
                 with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploaded_resume.name)[1]) as tmp_file:
                     tmp_file.write(uploaded_resume.getvalue())
                     resume_path = tmp_file.name
 
-                st.success(f"이력서 업로드 완료: {uploaded_resume.name}")
+                st.success(f"Your resume is uploaded: {uploaded_resume.name}")
 
-                if st.button("이력서 분석 시작"):
-                    with st.spinner("이력서를 분석 중..."):
+                if st.button("Start analyzing your resume"):
+                    with st.spinner("Analyzing your resume..."):
                         try:
                             with open(resume_path, 'r', encoding='utf-8') as f:
                                 resume_text = f.read()
                             profile = analyze_resume(resume_text)
                             st.session_state.transcript = profile
-                            st.success("이력서 분석이 완료되었습니다!")
+                            st.success("Resume analysis is complete!")
                         except Exception as e:
-                            st.error(f"이력서 분석 중 오류가 발생했습니다: {str(e)}")
+                            st.error(f"An error occurred during resume analysis: {str(e)}")
 
                 os.unlink(resume_path)
 
     with col2:
-        st.header("2. 역량 추출")
+        st.header("2. Extracting competencies")
         if st.session_state.transcript:
-            if st.button("역량 추출 시작"):
-                with st.spinner("역량을 분석 중..."):
+            if st.button("Start extracting competencies"):
+                with st.spinner("Analyzing competencies..."):
                     try:
                         profile = extract_competency_profile(st.session_state.transcript)
-                        st.subheader("추출된 역량")
+                        st.subheader("Extracted competencies")
                         st.text_area("", profile, height=400)
                         save_profile_to_csv(profile, config['default_csv_path'])
-                        st.success("역량 추출이 완료되었습니다!")
+                        st.success("Competency extraction is complete!")
                     except Exception as e:
-                        st.error(f"역량 추출 중 오류가 발생했습니다: {str(e)}")
+                        st.error(f"An error occurred while extracting competencies: {str(e)}")
         else:
-            st.info("입력 데이터를 먼저 준비해주세요.")
+            st.info("Prepare your input data.")
 
 if __name__ == "__main__":
     main()

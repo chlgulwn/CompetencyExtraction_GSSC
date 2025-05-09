@@ -10,7 +10,6 @@ from utils.utils_file import load_transcript, save_profile_to_csv
 
 os.environ["PATH"] += os.pathsep + r"C:\Users\hyeju\Downloads\ffmpeg-7.1.1-essentials_build\ffmpeg-7.1.1-essentials_build\bin"
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
@@ -41,10 +40,8 @@ def run_pipeline(
         csv_path (str, optional): Path for saving the competency profile
     """
     try:
-        # Load configuration
         config = load_config()
         
-        # Set default values if not provided
         txt_save_name = txt_save_name or config.get('default_transcript_name', 'interview1.txt')
         csv_path = csv_path or config.get('default_csv_path', 'interview_data/extracted_profiles.csv')
         
@@ -66,11 +63,11 @@ def run_pipeline(
         
         print("Step 3: Extracting profile via GPT...")
         profile = extract_competency_profile(user_text)
-        print("\nGPT 결과:\n", profile)
+        print("\nGPT Result:\n", profile)
         
         print("Step 4: Saving result to CSV...")
         save_profile_to_csv(profile, csv_path)
-        print("완료! 결과가 저장되었습니다.")
+        print("Done! Your result has been saved.")
         
     except Exception as e:
         logging.error(f"Pipeline failed: {str(e)}")
@@ -80,23 +77,13 @@ if __name__ == "__main__":
     try:
         config = load_config()
         
-        # Example usage
-        # For audio file:
-        # audio_file = "sample_audio.wav"
-        # run_pipeline(audio_file, input_type="audio")
-        
-        # For resume file:
-        # resume_file = "sample_resume.txt"
-        # run_pipeline(resume_file, input_type="resume")
-        
-        # Get input from user
-        input_type = input("입력 유형을 선택하세요 (audio/resume): ").lower()
+        input_type = input("Select your input type (audio/resume): ").lower()
         if input_type not in ["audio", "resume"]:
-            raise ValueError("입력 유형은 'audio' 또는 'resume'이어야 합니다.")
+            raise ValueError("The input type should be 'audio' or 'resume'.")
             
-        input_path = input(f"{input_type} 파일 경로를 입력하세요: ")
+        input_path = input(f"{input_type} Enter the path to the file: ")
         if not os.path.exists(input_path):
-            raise FileNotFoundError(f"파일을 찾을 수 없습니다: {input_path}")
+            raise FileNotFoundError(f"File not found: {input_path}")
             
         run_pipeline(input_path, input_type=input_type)
         
