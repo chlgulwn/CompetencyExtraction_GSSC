@@ -8,7 +8,6 @@ from typing import Optional
 import yaml
 import tempfile
 from STT_whisper.transcribe import transcribe_and_save
-from STT_whisper.realtime_transcribe import RealtimeTranscriber
 from PromptEngine.extracting_profile import extract_competency_profile
 from PromptEngine.resume_analyzer import analyze_resume
 from utils.utils_file import load_transcript, save_profile_to_csv
@@ -32,12 +31,12 @@ def main():
     config = load_config()
 
     st.set_page_config(
-        page_title="Senior Competency Extraction System",
+        page_title="Competency Extraction System",
         page_icon="🎤",
         layout="wide"
     )
 
-    st.title("🎤 Senior Competency Extraction System")
+    st.title("We want to know you better...🙋🏻")
     st.markdown("""
     The system analyzes the audio of an interview with a senior or a resume to extract key competencies.
     """)
@@ -53,33 +52,9 @@ def main():
 
     with col1:
         st.header("1. Choose an input method")
-        mode = st.radio("Select an input mode ", ["Real-time speech recognition", "Upload an audio file ", "Upload a resume"], horizontal=True)
+        mode = st.radio("Select an input mode ", ["Upload an audio file ", "Upload a resume"], horizontal=True)
 
-        if mode == "Real-time speech recognition":
-            if st.button("🎤 Start recording", disabled=st.session_state.is_recording):
-                try:
-                    st.session_state.transcriber = RealtimeTranscriber(
-                        model_size=config['whisper_model'],
-                        callback=update_transcript  
-                    )
-                    st.session_state.transcriber.start_recording()
-                    st.session_state.is_recording = True
-                    st.success("Recording has started. Please speak...")
-                except Exception as e:
-                    st.error(f"An error occurred while starting a recording: {str(e)}")
-
-            if st.button("⏹️ Stop recording", disabled=not st.session_state.is_recording):
-                try:
-                    st.session_state.transcriber.stop_recording()
-                    st.session_state.is_recording = False
-                    st.success("Recording has stopped.")
-                except Exception as e:
-                    st.error(f"An error occurred while stopping recording: {str(e)}")
-
-            st.subheader("Recognized text")
-            st.text_area("", st.session_state.transcript, height=200, key="transcript_area")
-
-        elif mode == "Upload an audio file":
+        if mode == "Upload an audio file":
             uploaded_file = st.file_uploader("Upload an audio file", type=config['supported_audio_formats'])
             if uploaded_file is not None:
                 tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploaded_file.name)[1])
